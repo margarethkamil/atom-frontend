@@ -1,6 +1,20 @@
 /* You can add global styles to this file, and also import other style files */
 @import '@angular/material/prebuilt-themes/indigo-pink.css';
 
+// Variables globales
+$primary-color: #e85d04; // Orange
+$primary-light: rgba(232, 93, 4, 0.1);
+$text-primary: #1f2937;
+$text-secondary: #4b5563; 
+$background-light: #fff8f3;
+$background-card: rgba(255, 252, 249, 0.95); // More opaque to hide background behind cards
+
+@keyframes subtle-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -9,11 +23,50 @@
 
 html, body {
   height: 100%;
+  margin: 0;
+  padding: 0;
   font-family: Roboto, "Helvetica Neue", sans-serif;
+  background: linear-gradient(130deg, #fff1e6, #ffedd8, #ffe8d6, #fff1e6);
+  background-size: 200% 200%;
+  animation: subtle-shift 20s ease infinite;
+  width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
+// Global light effects
+body::before {
+  content: '';
+  position: fixed;
+  top: -10%;
+  right: -10%;
+  width: 60%;
+  height: 60%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 204, 166, 0.8) 0%, rgba(255, 231, 217, 0) 70%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+body::after {
+  content: '';
+  position: fixed;
+  bottom: -10%;
+  left: -10%;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 179, 128, 0.6) 0%, rgba(255, 231, 217, 0) 60%);
+  z-index: 0;
+  pointer-events: none;
+}
+
+// Angular Material card styling adjustments
 .mat-mdc-card {
   --mat-card-title-text-size: 20px;
+  background-color: $background-card !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
 }
 
 .mat-mdc-form-field {
@@ -25,4 +78,40 @@ html, body {
   --mdc-snackbar-container-color: #4caf50;
   --mdc-snackbar-supporting-text-color: white;
   --mat-snack-bar-button-color: white;
+}
+
+// Light effects classes for global use
+.light-effect {
+  position: fixed;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.25;
+  z-index: 0;
+  pointer-events: none;
+}
+
+.light-effect-1 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, rgba(#e85d04, 0.15) 0%, rgba(#e85d04, 0) 70%);
+  top: 20%;
+  right: 10%;
+  animation: float 15s ease-in-out infinite;
+}
+
+.light-effect-2 {
+  width: 350px;
+  height: 350px;
+  background: radial-gradient(circle, rgba(lighten(#e85d04, 20%), 0.1) 0%, rgba(lighten(#e85d04, 20%), 0) 70%);
+  bottom: 10%;
+  left: 5%;
+  animation: float 18s ease-in-out infinite reverse;
+}
+
+@keyframes float {
+  0% { transform: translateY(0) translateX(0); }
+  25% { transform: translateY(-10px) translateX(10px); }
+  50% { transform: translateY(0) translateX(0); }
+  75% { transform: translateY(10px) translateX(-10px); }
+  100% { transform: translateY(0) translateX(0); }
 }

@@ -12,7 +12,7 @@
   </div>
 
   <!-- Mensaje para usuario ya autenticado -->
-  <mat-card class="login-card" *ngIf="userAlreadyAuthenticated">
+  <mat-card class="login-card" *ngIf="userAlreadyAuthenticated" appearance="outlined">
     <mat-card-header>
       <div mat-card-avatar 
            class="user-avatar" 
@@ -53,16 +53,23 @@
   </mat-card>
 
   <!-- Formulario de login normal -->
-  <mat-card class="login-card" *ngIf="!userAlreadyAuthenticated">
-    <mat-card-header>
-      <mat-card-title>Inicia sesión en Atom</mat-card-title>
-      <mat-card-subtitle>Gestiona tus tareas diarias de forma simple</mat-card-subtitle>
-    </mat-card-header>
+  <mat-card class="login-card" *ngIf="!userAlreadyAuthenticated" appearance="outlined">
+    <div class="orange-top-border"></div>
     <mat-card-content>
+      <div class="login-header">
+        <h1 class="login-title">Inicia sesión en Atom</h1>
+        <p class="login-subtitle">Gestiona tus tareas diarias de forma simple y eficiente</p>
+      </div>
+      
+      <div class="logo-container">
+        <img src="assets/images/logo-atom-chat.png" alt="Atom Logo" class="atom-logo">
+      </div>
+      
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>Correo Electrónico</mat-label>
           <input matInput formControlName="email" type="email" required>
+          <mat-icon matSuffix>email</mat-icon>
           <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
             El correo electrónico es requerido
           </mat-error>
@@ -86,10 +93,10 @@
         </button>
       </form>
       
-      <mat-divider class="divider"></mat-divider>
+      <div class="divider">o</div>
       
       <button 
-        mat-raised-button 
+        mat-stroked-button 
         class="google-button" 
         (click)="loginWithGoogle()"
         [disabled]="isGoogleLoading">
@@ -101,4 +108,7 @@
       </button>
     </mat-card-content>
   </mat-card>
+  
+  <div class="light-effect light-effect-1"></div>
+  <div class="light-effect light-effect-2"></div>
 </div> 

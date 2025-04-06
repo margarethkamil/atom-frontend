@@ -457,6 +457,28 @@ export class TaskListComponent implements OnInit, OnDestroy {
     return `${day}/${month}/${year}`;
   }
 
+  /**
+   * Check if a date is within 3 days from now
+   */
+  isDateSoon(date: Date | string): boolean {
+    if (!date) return false;
+    
+    const dateObj = date instanceof Date ? date : new Date(date);
+    const now = new Date();
+    
+    // Reset hours to compare just dates
+    now.setHours(0, 0, 0, 0);
+    const compareDate = new Date(dateObj);
+    compareDate.setHours(0, 0, 0, 0);
+    
+    // Calculate difference in days
+    const diffTime = compareDate.getTime() - now.getTime();
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    
+    // Return true if date is in the past or within 3 days
+    return diffDays <= 3 && diffDays >= 0;
+  }
+
   handleImageError(event: any): void {
     console.error('Error loading profile image:', event);
     // Set default image or hide the img element
