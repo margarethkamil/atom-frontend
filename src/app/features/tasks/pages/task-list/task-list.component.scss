@@ -4,12 +4,12 @@ $primary-light: rgba(232, 93, 4, 0.1);
 $text-primary: #1f2937;
 $text-secondary: #4b5563; 
 $background-light: #fff8f3;
-$background-card: rgba(255, 252, 249, 0.95);
+$background-card: #ffffff;
 $error-color: #ef4444;
 $success-color: #10b981;
 $warning-color: #f59e0b;
 $border-radius: 16px;
-$box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.03);
+$box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
 $transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 
 // Mixins
@@ -24,8 +24,8 @@ $transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 @mixin hover-elevation {
   transition: $transition-default;
   &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 18px 35px rgba(0, 0, 0, 0.08);
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
   }
 }
 
@@ -41,59 +41,6 @@ $transition-default: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   }
 }
 
-@mixin card-base {
-  background-color: $background-card;
-  border-radius: $border-radius;
-  box-shadow: $box-shadow;
-  position: relative;
-  z-index: 1;
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-}
-
-@mixin card-top-border {
-  // Empty mixin - orange borders removed
-}
-
-// Full-width background that covers the entire screen
-html, body {
-  margin: 0;
-  padding: 0;
-  background: linear-gradient(130deg, #fff1e6, #ffedd8, #ffe8d6, #fff1e6);
-  background-size: 200% 200%;
-  animation: subtle-shift 20s ease infinite;
-  min-height: 100vh;
-  width: 100%;
-  overflow-x: hidden;
-  position: relative;
-  
-  &::before {
-    content: '';
-    position: fixed;
-    top: -10%;
-    right: -10%;
-    width: 60%;
-    height: 60%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 204, 166, 0.8) 0%, rgba(255, 231, 217, 0) 70%);
-    z-index: 0;
-    pointer-events: none;
-  }
-  
-  &::after {
-    content: '';
-    position: fixed;
-    bottom: -10%;
-    left: -10%;
-    width: 70%;
-    height: 70%;
-    border-radius: 50%;
-    background: radial-gradient(circle, rgba(255, 179, 128, 0.6) 0%, rgba(255, 231, 217, 0) 60%);
-    z-index: 0;
-    pointer-events: none;
-  }
-}
-
 .task-container {
   max-width: 1140px;
   margin: 0 auto;
@@ -105,12 +52,16 @@ html, body {
   color: $text-primary;
   position: relative;
   min-height: 100vh;
-  // Background is now in global styles
-  background: transparent;
+  
+  // Modern orange gradient background
+  background: linear-gradient(130deg, #fff1e6, #ffedd8, #ffe8d6);
+  background-size: 400% 400%;
+  animation: subtle-shift 15s ease infinite;
   
   @media (min-width: 1200px) {
     padding: 40px 40px;
   }
+  
 }
 
 .task-header {
@@ -125,10 +76,9 @@ html, body {
     font-weight: 700;
     letter-spacing: -0.5px;
     color: $text-primary;
-    // Make the heading less prominently orange
-    background: none;
-    -webkit-background-clip: initial;
-    -webkit-text-fill-color: initial;
+    background: linear-gradient(90deg, $primary-color, darken($primary-color, 15%));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
   }
   
   .user-info {
@@ -146,14 +96,23 @@ html, body {
     position: relative;
     z-index: 1;
     
-    // No orange top border
+    &::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 4px;
+      background: $primary-color;
+      border-radius: $border-radius $border-radius 0 0;
+    }
     
     .user-avatar {
       width: 48px;
       height: 48px;
       border-radius: 50%;
       overflow: hidden;
-      border: 2px solid rgba(0, 0, 0, 0.1); // Subtle border instead of orange
+      border: 2px solid $primary-light;
       background-color: $background-light;
       flex-shrink: 0;
       display: block;
@@ -191,12 +150,26 @@ html, body {
 }
 
 .new-task-card {
-  @include card-base;
-  // No top border
   margin-bottom: 36px;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
   overflow: hidden;
   border: none;
   transition: $transition-default;
+  background: linear-gradient(to right bottom, #ffffff, #f9f9f9);
+  position: relative;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $primary-color;
+    border-radius: $border-radius $border-radius 0 0;
+  }
   
   &:hover {
     box-shadow: 0 20px 30px -10px rgba(0, 0, 0, 0.1);
@@ -222,8 +195,7 @@ html, body {
       left: 0;
       height: 3px;
       width: 80px;
-      // Reduce orange prominence
-      background: rgba(0, 0, 0, 0.1);
+      background: linear-gradient(90deg, $primary-color, lighten($primary-color, 20%));
       border-radius: 3px;
     }
   }
@@ -331,9 +303,23 @@ html, body {
   gap: 16px;
   margin-bottom: 32px;
   padding: 24px;
-  @include card-base;
-  @include card-top-border;
+  background-color: $background-card;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
   transition: $transition-default;
+  position: relative;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $primary-color;
+    border-radius: $border-radius $border-radius 0 0;
+  }
   
   &:hover {
     box-shadow: 0 15px 30px rgba(0, 0, 0, 0.08);
@@ -410,9 +396,23 @@ html, body {
   padding: 70px 24px;
   text-align: center;
   color: $text-secondary;
-  @include card-base;
-  @include card-top-border;
+  background-color: $background-card;
+  border-radius: $border-radius;
   margin: 16px 0 40px;
+  box-shadow: $box-shadow;
+  position: relative;
+  z-index: 1;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $primary-color;
+    border-radius: $border-radius $border-radius 0 0;
+  }
   
   mat-icon {
     font-size: 64px;
@@ -457,21 +457,36 @@ html, body {
 }
 
 .task-card {
-  @include card-base;
-  // No top border
+  border-radius: $border-radius;
+  border: none;
+  box-shadow: $box-shadow;
+  overflow: hidden;
+  transition: $transition-default;
+  background-color: $background-card;
+  position: relative;
+  z-index: 1;
   @include hover-elevation;
   height: 100%;
   display: flex;
   flex-direction: column;
-  border-radius: $border-radius;
-  border: none;
-  overflow: hidden;
-  transition: $transition-default;
+  
+  &::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 4px;
+    background: $primary-color;
+    border-radius: $border-radius $border-radius 0 0;
+  }
   
   &.completed {
-    background-color: rgba($background-light, 0.7);
+    background-color: rgba($background-light, 0.8);
     
-    // No success colored top border
+    &::before {
+      background: $success-color;
+    }
     
     .task-title {
       color: $text-secondary;
@@ -782,33 +797,6 @@ html, body {
   mat-icon {
     color: $primary-color;
   }
-}
-
-.light-effect {
-  position: fixed;
-  border-radius: 50%;
-  filter: blur(80px);
-  opacity: 0.25;
-  z-index: 0;
-  pointer-events: none;
-}
-
-.light-effect-1 {
-  width: 450px;
-  height: 450px;
-  background: radial-gradient(circle, rgba(#e85d04, 0.15) 0%, rgba(#e85d04, 0) 70%);
-  top: 20%;
-  right: 10%;
-  animation: float 15s ease-in-out infinite;
-}
-
-.light-effect-2 {
-  width: 350px;
-  height: 350px;
-  background: radial-gradient(circle, rgba(lighten(#e85d04, 20%), 0.1) 0%, rgba(lighten(#e85d04, 20%), 0) 70%);
-  bottom: 10%;
-  left: 5%;
-  animation: float 18s ease-in-out infinite reverse;
 }
 
 @keyframes float {

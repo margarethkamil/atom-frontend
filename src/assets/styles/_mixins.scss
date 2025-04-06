@@ -1,0 +1,40 @@
+// Mixins comunes
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+    box-shadow: 0 0 0 4px rgba($primary-color, 0.2);
+  }
+}
+
+@mixin hover-elevation {
+  transition: $transition-default;
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 15px 30px rgba(0, 0, 0, 0.1);
+  }
+}
+
+@mixin card-base {
+  background-color: $background-card;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  position: relative;
+  z-index: 1;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+// Keyframes para animaciones
+
+@keyframes subtle-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+} 
