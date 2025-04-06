@@ -17,11 +17,11 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { Router } from '@angular/router';
 import { Observable, Subject, takeUntil } from 'rxjs';
 
-import { AuthService } from '../../auth/auth.service';
-import { User } from '../../shared/interfaces/user.interface';
-import { CreateTaskDto, Task, TaskFilters, TaskState } from '../../shared/interfaces/task.interface';
-import { TaskService } from '../task.service';
-import { TaskEditDialogComponent } from '../task-edit-dialog/task-edit-dialog.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { User } from '../../../../shared/models/user.interface';
+import { CreateTaskDto, Task, TaskFilters, TaskState } from '../../../../shared/models/task.interface';
+import { TaskService } from '../../services/task.service';
+import { TaskEditDialogComponent } from '../../components/task-edit-dialog/task-edit-dialog.component';
 
 /**
  * Task List Component

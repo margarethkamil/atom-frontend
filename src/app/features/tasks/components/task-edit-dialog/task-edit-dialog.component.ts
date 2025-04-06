@@ -10,7 +10,7 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { MatCheckboxModule } from '@angular/material/checkbox';
 
-import { Task, UpdateTaskDto } from '../../shared/interfaces/task.interface';
+import { Task, UpdateTaskDto } from '../../../../shared/models/task.interface';
 
 @Component({
   selector: 'app-task-edit-dialog',

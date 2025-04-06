@@ -6,7 +6,7 @@ import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 
 import { environment } from '../../../environments/environment';
-import { User } from '../shared/interfaces/user.interface';
+import { User } from '../../shared/models/user.interface';
 
 // Inicializa Firebase al cargar este servicio
 const firebaseApp = initializeApp(environment.firebase);

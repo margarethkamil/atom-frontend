@@ -3,9 +3,9 @@ import { Injectable, OnDestroy } from '@angular/core';
 import { BehaviorSubject, Observable, of, throwError } from 'rxjs';
 import { catchError, finalize, map, switchMap, take, takeUntil, tap, timeout } from 'rxjs/operators';
 
-import { environment } from '../../../environments/environment';
-import { CreateTaskDto, Task, TaskFilters, TaskState, UpdateTaskDto } from '../shared/interfaces/task.interface';
-import { AuthService } from '../auth/auth.service';
+import { environment } from '../../../../environments/environment';
+import { CreateTaskDto, Task, TaskFilters, TaskState, UpdateTaskDto } from '../../../shared/models/task.interface';
+import { AuthService } from '../../../core/services/auth.service';
 
 /**
  * Service for managing tasks with backend integration
@@ -40,8 +40,8 @@ export class TaskService implements OnDestroy {
     map(state => this.applyFilters(state.tasks, state.filters))
   );
   
-  // Flag to track if tasks were loaded
-  private tasksLoaded = false;
+  // Track current user ID to prevent data leaks between users
+  private currentUserId: string | null = null;
   
   // Subject to handle unsubscription
   private destroy$ = new BehaviorSubject<boolean>(false);
@@ -52,24 +52,33 @@ export class TaskService implements OnDestroy {
   ) {
     console.log('TaskService initialized with API URL:', this.apiUrl);
     
-    // Reset state when user logs out
+    // Monitor user changes and reset/reload as needed
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         if (!user) {
           console.log('User logged out, resetting task state');
           this.resetState();
+          this.currentUserId = null;
+        } else {
+          const userId = user.id || null;
+          if (userId !== this.currentUserId) {
+            console.log(`User changed: ${userId}. Previous: ${this.currentUserId}. Reloading tasks.`);
+            this.currentUserId = userId;
+            // Reset state and force reload
+            this.resetState();
+            this.loadTasks().pipe(take(1)).subscribe();
+          }
         }
       });
   }
   
   /**
-   * Reset state to initial values when user logs out
+   * Reset state to initial values
    */
   private resetState(): void {
     this.state = { ...this.initialState };
     this.stateSubject.next(this.state);
-    this.tasksLoaded = false;
   }
   
   /**
@@ -97,47 +106,17 @@ export class TaskService implements OnDestroy {
 
   /**
    * Load all tasks from the backend
-   * If tasks are already loaded, it won't fetch again unless force=true
    */
-  loadTasks(force: boolean = false): Observable<Task[]> {
-    // If tasks are already loaded and force is false, return current tasks
-    if (this.tasksLoaded && !force && this.state.tasks.length > 0) {
-      console.log('Using cached tasks:', this.state.tasks.length);
-      return of(this.state.tasks);
-    }
-    
-    console.log('Fetching tasks from server, current state:', { 
-      isLoading: this.state.isLoading,
-      tasksLoaded: this.tasksLoaded,
-      taskCount: this.state.tasks.length,
-      userAuthenticated: this.authService.isAuthenticated()
-    });
+  loadTasks(): Observable<Task[]> {
+    console.log('Fetching tasks from server for user:', this.currentUserId);
     
     this.setState({ isLoading: true, error: null });
     
-    // Get auth token status for logging
-    const hasToken = !!this.authService.getAuthToken();
-    console.log('Auth token available:', hasToken);
-    
-    // The actual request - AuthInterceptor will add the token automatically
     return this.http.get<any>(this.apiUrl).pipe(
-      // Add a timeout to avoid hanging requests
       timeout(10000),
-      map(response => {
-        console.log('Raw API response type:', typeof response);
-        if (response) {
-          console.log('API response structure:', Object.keys(response));
-          
-          if (response.status) {
-            console.log('API response status:', response.status);
-          }
-        }
-        
-        return this.normalizeTasksResponse(response);
-      }),
+      map(response => this.normalizeTasksResponse(response)),
       tap(tasks => {
         console.log(`Received ${tasks.length} tasks from API`);
-        // Debug - log first task if available
         if (tasks.length > 0) {
           console.log('First task sample:', JSON.stringify(tasks[0]));
         }
@@ -146,18 +125,9 @@ export class TaskService implements OnDestroy {
           tasks,
           isLoading: false 
         });
-        this.tasksLoaded = true;
       }),
       catchError(error => {
         console.error('Error in loadTasks():', error);
-        console.error('Error details:', { 
-          status: error.status, 
-          message: error.message,
-          url: error.url,
-          name: error.name
-        });
-        // Reset the tasksLoaded flag so we can try again
-        this.tasksLoaded = false;
         return this.handleError('Failed to load tasks', error);
       }),
       finalize(() => {
@@ -285,7 +255,7 @@ export class TaskService implements OnDestroy {
    * Force refresh all tasks from the server
    */
   refreshTasks(): Observable<Task[]> {
-    return this.loadTasks(true);
+    return this.loadTasks();
   }
 
   /**

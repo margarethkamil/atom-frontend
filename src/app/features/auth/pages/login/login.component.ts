@@ -23,9 +23,9 @@ import {
   tap
 } from 'rxjs';
 
-import { AuthService } from '../auth.service';
-import { User } from '../../shared/interfaces/user.interface';
-import { RegisterConfirmDialogComponent } from '../register-confirm-dialog/register-confirm-dialog.component';
+import { AuthService } from '../../../../core/services/auth.service';
+import { User } from '../../../../shared/models/user.interface';
+import { RegisterConfirmDialogComponent } from '../../components/register-confirm-dialog/register-confirm-dialog.component';
 
 /**
  * Login component that handles the authentication flow:
