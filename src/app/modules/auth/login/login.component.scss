@@ -1,0 +1,138 @@
+.login-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 80vh;
+  padding: 20px;
+}
+
+.login-card {
+  max-width: 400px;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.login-button {
+  width: 100%;
+  height: 46px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.button-spinner {
+  margin: 0 auto;
+}
+
+.error-message {
+  color: #f44336;
+  font-size: 14px;
+  margin: 10px 0;
+}
+
+.divider {
+  margin: 20px 0;
+  position: relative;
+  text-align: center;
+  
+  &::after {
+    content: "o";
+    display: inline-block;
+    position: relative;
+    top: -0.7em;
+    padding: 0 10px;
+    background: white;
+  }
+}
+
+.google-button {
+  width: 100%;
+  height: 46px;
+  background-color: white;
+  border: 1px solid #dadce0;
+  color: #3c4043;
+  
+  &:hover {
+    background-color: #f8f9fa;
+    border-color: #dadce0;
+    box-shadow: 0 1px 2px 0 rgba(60,64,67,.3), 0 1px 3px 1px rgba(60,64,67,.15);
+  }
+}
+
+.google-button-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+}
+
+.google-logo {
+  width: 18px;
+  height: 18px;
+  margin-right: 8px;
+}
+
+// Estilos para el mensaje de usuario ya autenticado
+.authenticated-message {
+  text-align: center;
+  margin: 20px 0;
+  
+  p {
+    margin-bottom: 20px;
+    font-size: 16px;
+    color: #555;
+  }
+}
+
+.auth-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  
+  .login-button, .logout-button {
+    width: 100%;
+    height: 46px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    
+    mat-icon {
+      margin-right: 8px;
+    }
+  }
+}
+
+mat-card-header {
+  margin-bottom: 20px;
+}
+
+mat-card-title {
+  font-size: 24px;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+mat-card-subtitle {
+  color: #666;
+}
+
+// Estilo para la foto de perfil
+.user-avatar {
+  width: 40px;
+  height: 40px;
+  background-size: cover;
+  background-position: center;
+  border-radius: 50%;
+  border: 2px solid #3f51b5;
+  margin-right: 16px;
+  flex-shrink: 0;
+}
+
+@media (max-width: 600px) {
+  .login-card {
+    max-width: 100%;
+  }
+} 

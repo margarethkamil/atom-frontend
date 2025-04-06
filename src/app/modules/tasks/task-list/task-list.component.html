@@ -1,0 +1,183 @@
+<!-- Task Management View -->
+<div class="task-container">
+  <!-- Header with user info -->
+  <header class="task-header">
+    <div class="user-info" *ngIf="currentUser">
+      <div class="user-avatar" *ngIf="currentUser.photoURL">
+        <img [src]="currentUser.photoURL" alt="User avatar" (error)="handleImageError($event)">
+      </div>
+      <div class="user-details">
+        <h3>Bienvenido, {{ currentUser.displayName || currentUser.email }}</h3>
+      </div>
+      <button mat-icon-button color="warn" (click)="logout()" aria-label="Logout" class="logout-button">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- Add Task Form -->
+  <mat-card class="new-task-card">
+    <mat-card-content>
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()">
+        <h2>Nueva Tarea</h2>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="title" placeholder="Título de la tarea" required>
+          <mat-error *ngIf="taskForm.get('title')?.hasError('required')">
+            El título es obligatorio
+          </mat-error>
+          <mat-error *ngIf="taskForm.get('title')?.hasError('maxlength')">
+            El título no puede exceder los 100 caracteres
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" placeholder="Descripción detallada" rows="3" required></textarea>
+          <mat-error *ngIf="taskForm.get('description')?.hasError('required')">
+            La descripción es obligatoria
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- Priority Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Prioridad</mat-label>
+          <mat-select formControlName="priority">
+            <mat-option value="low">Baja</mat-option>
+            <mat-option value="medium">Media</mat-option>
+            <mat-option value="high">Alta</mat-option>
+          </mat-select>
+        </mat-form-field>
+        
+        <!-- Due Date Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Fecha límite</mat-label>
+          <input matInput [matDatepicker]="picker" formControlName="dueDate">
+          <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
+          <mat-datepicker #picker></mat-datepicker>
+        </mat-form-field>
+        
+        <!-- Tags Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Etiquetas (separadas por comas)</mat-label>
+          <input matInput formControlName="tags" placeholder="trabajo, informe, proyecto">
+          <mat-hint>Escribe las etiquetas separadas por comas</mat-hint>
+        </mat-form-field>
+        
+        <div class="button-container">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="taskForm.invalid || (taskState$ | async)?.isLoading">
+            <mat-spinner *ngIf="(taskState$ | async)?.isLoading" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!(taskState$ | async)?.isLoading">Guardar</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error message display -->
+  <div *ngIf="(taskState$ | async)?.error" class="error-message">
+    {{ (taskState$ | async)?.error }}
+    <button mat-button color="primary" (click)="loadTasks()">Reintentar</button>
+  </div>
+
+  <!-- Tasks Filter Section -->
+  <div class="task-filters">
+    <mat-form-field appearance="outline" class="search-filter">
+      <mat-label>Buscar tareas</mat-label>
+      <input matInput #searchInput (keyup)="updateSearchTerm(searchInput.value)" placeholder="Buscar por título o descripción">
+      <mat-icon matSuffix>search</mat-icon>
+    </mat-form-field>
+    
+    <div class="filter-actions">
+      <button mat-button color="primary" [class.active-filter]="isShowingAllTasks()" 
+        (click)="showAllTasks()">
+        Todas
+      </button>
+      <button mat-button color="primary" [class.active-filter]="isShowingPendingTasks()"
+        (click)="showPendingTasks()">
+        Pendientes
+      </button>
+      <button mat-button color="primary" [class.active-filter]="isShowingCompletedTasks()"
+        (click)="showCompletedTasks()">
+        Completadas
+      </button>
+      
+      <button mat-icon-button color="primary" aria-label="Refresh tasks" 
+        (click)="refreshTasks()" [disabled]="(taskState$ | async)?.isLoading">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Task list -->
+  <div class="task-list-container">
+    <div *ngIf="(taskState$ | async)?.isLoading && (filteredTasks$ | async)?.length === 0" class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+      <p>Cargando tareas...</p>
+    </div>
+
+    <div *ngIf="!(taskState$ | async)?.isLoading && (filteredTasks$ | async)?.length === 0" class="empty-container">
+      <mat-icon>assignment</mat-icon>
+      <p>No hay tareas para mostrar</p>
+      <p *ngIf="hasFiltersApplied()" class="hint-text">
+        Intenta cambiar los filtros aplicados
+      </p>
+    </div>
+
+    <div class="task-list">
+      <mat-card *ngFor="let task of filteredTasks$ | async" class="task-card" [ngClass]="{'completed': task.completed}">
+        <mat-card-header>
+          <mat-card-title class="task-title">
+            <mat-checkbox
+              [checked]="task.completed"
+              (change)="toggleComplete(task)"
+              color="primary">
+              {{ task.title }}
+            </mat-checkbox>
+          </mat-card-title>
+          <mat-card-subtitle>
+            Creada el {{ formatDate(task.createdAt) }}
+            <span *ngIf="task.updatedAt">· Actualizada el {{ formatDate(task.updatedAt) }}</span>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="task-description">{{ task.description }}</p>
+          
+          <!-- Task metadata -->
+          <div class="task-metadata">
+            <!-- Priority badge if available -->
+            <div *ngIf="task.priority" class="priority-badge" [ngClass]="'priority-' + task.priority.toLowerCase()">
+              {{ task.priority === 'low' ? 'Baja' : (task.priority === 'medium' ? 'Media' : 'Alta') }}
+            </div>
+            
+            <!-- Due date if available -->
+            <div *ngIf="task.dueDate" class="due-date">
+              <mat-icon>event</mat-icon>
+              <span>Fecha límite: {{ formatDate(task.dueDate) }}</span>
+            </div>
+          </div>
+          
+          <!-- Tags if available -->
+          <div *ngIf="task.tags && task.tags.length > 0" class="task-tags">
+            <mat-chip-set>
+              <mat-chip *ngFor="let tag of task.tags">{{ tag }}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button color="primary" (click)="editTask(task)" aria-label="Edit task">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTask(task)" aria-label="Delete task">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </div>
+</div> 
