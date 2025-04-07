@@ -18,6 +18,9 @@
 
   <!-- Add Task Form -->
   <mat-card class="new-task-card" appearance="outlined">
+    <!-- Tape image -->
+    <img src="assets/images/duct-tape.png" class="tape-image form-tape" alt="tape">
+    
     <mat-card-content>
       <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" role="form" aria-labelledby="newTaskFormTitle">
         <h2 id="newTaskFormTitle">Nueva Tarea</h2>
@@ -147,6 +150,9 @@
       <mat-card *ngFor="let task of filteredTasks$ | async; let i = index" class="task-card" 
                 [ngClass]="{'completed': task.completed}" role="listitem" tabindex="0"
                 [attr.aria-label]="'Tarea: ' + task.title + (task.completed ? ', completada' : ', pendiente')">
+        <!-- Tape image -->
+        <img src="assets/images/duct-tape.png" class="tape-image" [class.completed-tape]="task.completed" alt="tape">
+                
         <mat-card-header>
           <mat-card-title class="task-title">
             <mat-checkbox
@@ -157,12 +163,12 @@
               {{ task.title }}
             </mat-checkbox>
             <span *ngIf="task.completed" class="completed-badge" aria-label="Tarea completada">
-              <mat-icon>done</mat-icon>Completada
+              <mat-icon>check_circle</mat-icon>Completada
             </span>
           </mat-card-title>
-          <mat-card-subtitle>
-            <span aria-label="Fecha de creación">Creada el {{ formatDate(task.createdAt) }}</span>
-            <span *ngIf="task.updatedAt" aria-label="Fecha de actualización">· Actualizada el {{ formatDate(task.updatedAt) }}</span>
+          <mat-card-subtitle class="task-dates">
+            <div aria-label="Fecha de creación">Creada el {{ formatDate(task.createdAt) }}</div>
+            <div *ngIf="task.updatedAt" aria-label="Fecha de actualización">Actualizada el {{ formatDate(task.updatedAt) }}</div>
           </mat-card-subtitle>
         </mat-card-header>
         <mat-card-content>
