@@ -4,6 +4,10 @@
 
 This project is a robust Angular-based application built with Angular 17.3.6 for the Atom technical challenge. It implements a modern, secure task management application with comprehensive user authentication and a clean, responsive UI.
 
+## CI/CD
+
+This project implements continuous integration and continuous deployment (CI/CD) using GitHub Actions.
+
 ## Features
 
 ### Authentication & Security
