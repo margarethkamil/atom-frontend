@@ -63,14 +63,14 @@ export class AuthInterceptor implements HttpInterceptor {
     if (error instanceof HttpErrorResponse) {
       // Handle 401 Unauthorized - log the user out
       if (error.status === 401) {
-        console.log('Auth interceptor: Unauthorized request, logging out');
+       // console.log('Auth interceptor: Unauthorized request, logging out');
         this.authService.logout();
         this.router.navigate(['/login']);
       }
       
       // Handle 403 Forbidden - user doesn't have permission
       if (error.status === 403) {
-        console.log('Auth interceptor: Forbidden resource access');
+        // console.log('Auth interceptor: Forbidden resource access');
       }
     }
     

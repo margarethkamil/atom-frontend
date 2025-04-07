@@ -83,7 +83,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private router: Router,
     private seoService: SeoService
   ) {
-    console.log('TaskListComponent initialized');
+    // console.log('TaskListComponent initialized');
     
     // Initialize form with validators
     this.taskForm = this.createTaskForm();
@@ -116,21 +116,21 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Initialize component and subscribe to auth state
    */
   ngOnInit(): void {
-    console.log('TaskListComponent initialized');
+    // console.log('TaskListComponent initialized');
     
     // Subscribe to user changes
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
-        console.log('Current user updated in component:', user);
+        // console.log('Current user updated in component:', user);
         this.currentUser = user;
         
         // Load tasks if user is authenticated
         if (user) {
-          console.log('User is authenticated, loading tasks for:', user.email);
+          // console.log('User is authenticated, loading tasks for:', user.email);
           this.loadTasks();
         } else {
-          console.log('No authenticated user, skipping task loading');
+          // console.log('No authenticated user, skipping task loading');
         }
       });
       
@@ -138,11 +138,11 @@ export class TaskListComponent implements OnInit, OnDestroy {
     this.taskState$
       .pipe(takeUntil(this.destroy$))
       .subscribe(state => {
-        console.log('Task state updated:', {
-          tasksCount: state.tasks.length,
-          isLoading: state.isLoading,
-          error: state.error
-        });
+        // console.log('Task state updated:', {
+        //   tasksCount: state.tasks.length,
+        //   isLoading: state.isLoading,
+        //   error: state.error
+        // });
       });
     
     // Set SEO metadata
@@ -157,7 +157,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Clean up subscriptions when component is destroyed
    */
   ngOnDestroy(): void {
-    console.log('TaskListComponent being destroyed');
+    // console.log('TaskListComponent being destroyed');
     this.destroy$.next();
     this.destroy$.complete();
   }
@@ -175,21 +175,21 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Load tasks from the server
    */
   loadTasks(): void {
-    console.log('Starting task loading process');
+    // console.log('Starting task loading process');
     this.taskService.loadTasks()
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (tasks) => {
-          console.log(`Successfully loaded ${tasks.length} tasks in component`);
+          // console.log(`Successfully loaded ${tasks.length} tasks in component`);
           // Verify that tasks were actually loaded
           if (tasks.length === 0) {
-            console.warn('API returned zero tasks - this might be expected for new users');
+            // console.warn('API returned zero tasks - this might be expected for new users');
           } else {
-            console.log('First task sample:', tasks[0]);
+            // console.log('First task sample:', tasks[0]);
           }
         },
         error: (error) => {
-          console.error('Error loading tasks in component:', error);
+          // console.error('Error loading tasks in component:', error);
           this.showSnackBar('Error al cargar las tareas');
         }
       });
@@ -199,12 +199,12 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Force reload tasks from server
    */
   refreshTasks(): void {
-    console.log('Force refreshing tasks');
+    // console.log('Force refreshing tasks');
     this.showSnackBar('Actualizando tareas...', 'Cerrar', 1000);
     
     // Check if user is authenticated
     if (!this.authService.isAuthenticated()) {
-      console.warn('No authenticated user when trying to refresh tasks');
+      // console.warn('No authenticated user when trying to refresh tasks');
       this.showSnackBar('Error: No se encontró usuario autenticado');
       this.router.navigate(['/login']);
       return;
@@ -215,7 +215,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (tasks) => {
-          console.log(`Successfully refreshed ${tasks.length} tasks`);
+          // console.log(`Successfully refreshed ${tasks.length} tasks`);
           this.showSnackBar('Tareas actualizadas correctamente');
         },
         error: (error) => {
@@ -259,13 +259,13 @@ export class TaskListComponent implements OnInit, OnDestroy {
       tags
     };
 
-    console.log('Creating new task:', newTask);
+    // console.log('Creating new task:', newTask);
     
     this.taskService.createTask(newTask)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (task) => {
-          console.log('Task created successfully:', task);
+          // console.log('Task created successfully:', task);
           this.snackBar.open('Tarea creada con éxito', 'Cerrar', { 
             duration: 3000 
           });
@@ -274,7 +274,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
           });
         },
         error: (error) => {
-          console.error('Error creating task:', error);
+          // console.error('Error creating task:', error);
           this.snackBar.open('Error al crear la tarea', 'Cerrar', {
             duration: 3000
           });
@@ -286,16 +286,16 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Toggle task completion status
    */
   toggleComplete(task: Task): void {
-    console.log('Toggling task completion:', task.id);
+    // console.log('Toggling task completion:', task.id);
     
     this.taskService.toggleTaskCompletion(task.id!, task.completed)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (updatedTask) => {
-          console.log('Task updated successfully:', updatedTask);
+          // console.log('Task updated successfully:', updatedTask);
         },
         error: (error) => {
-          console.error('Error updating task:', error);
+          // console.error('Error updating task:', error);
           this.showSnackBar('Error al actualizar la tarea');
         }
       });
@@ -305,7 +305,7 @@ export class TaskListComponent implements OnInit, OnDestroy {
    * Open dialog to edit a task
    */
   editTask(task: Task): void {
-    console.log('Opening edit dialog for task:', task);
+    // console.log('Opening edit dialog for task:', task);
     
     const dialogRef = this.dialog.open(TaskEditDialogComponent, {
       width: '500px',
@@ -316,22 +316,22 @@ export class TaskListComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe(result => {
         if (!result) {
-          console.log('Edit dialog closed without saving');
+          // console.log('Edit dialog closed without saving');
           return;
         }
         
-        console.log('Updating task with new data:', result);
+        // console.log('Updating task with new data:', result);
         
         this.taskService.updateTask(task.id!, result)
           .subscribe({
             next: (updatedTask) => {
-              console.log('Task updated successfully:', updatedTask);
+              // console.log('Task updated successfully:', updatedTask);
               this.snackBar.open('Tarea actualizada con éxito', 'Cerrar', { 
                 duration: 3000 
               });
             },
             error: (error) => {
-              console.error('Error updating task:', error);
+              // console.error('Error updating task:', error);
               this.snackBar.open('Error al actualizar la tarea', 'Cerrar', { 
                 duration: 3000 
               });
@@ -345,17 +345,17 @@ export class TaskListComponent implements OnInit, OnDestroy {
    */
   deleteTask(task: Task): void {
     if (confirm('¿Estás seguro de que deseas eliminar esta tarea?')) {
-      console.log('Deleting task:', task.id);
+      // console.log('Deleting task:', task.id);
       
       this.taskService.deleteTask(task.id!)
         .pipe(takeUntil(this.destroy$))
         .subscribe({
           next: () => {
-            console.log('Task deleted successfully');
+            // console.log('Task deleted successfully');
             this.showSnackBar('Tarea eliminada con éxito');
           },
           error: (error) => {
-            console.error('Error deleting task:', error);
+            // console.error('Error deleting task:', error);
             this.showSnackBar('Error al eliminar la tarea');
           }
         });

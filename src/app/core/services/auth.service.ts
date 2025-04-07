@@ -49,7 +49,7 @@ export class AuthService {
     private http: HttpClient,
     private router: Router
   ) {
-    console.log('Auth Service initialized with API URL:', environment.apiUrl);
+    // console.log('Auth Service initialized with API URL:', environment.apiUrl);
     
     // Check if user data exists in localStorage
     this.loadUserFromStorage();
@@ -64,9 +64,9 @@ export class AuthService {
       try {
         const user = JSON.parse(userJson);
         this.currentUserSubject.next(user);
-        console.log('User loaded from storage:', user.email);
+        // console.log('User loaded from storage:', user.email);
       } catch (e) {
-        console.error('Failed to parse stored user data', e);
+        // console.error('Failed to parse stored user data', e);
         this.clearStoredAuth();
       }
     }
@@ -79,7 +79,7 @@ export class AuthService {
    * @returns Observable with AuthResponse indicating if user exists
    */
   login(email: string, displayName?: string): Observable<AuthResponse> {
-    console.log('Attempting login with email:', email);
+    // console.log('Attempting login with email:', email);
     const apiUrl = `${environment.apiUrl}/auth/login`;
     
     const payload = {
@@ -89,7 +89,7 @@ export class AuthService {
     
     return this.http.post<AuthResponse>(apiUrl, payload).pipe(
       tap(response => {
-        console.log('Login response received from server:', response);
+       // console.log('Login response received from server:', response);
         
         // Check if user exists based on multiple criteria:
         // 1. Explicit userExists flag
@@ -106,18 +106,18 @@ export class AuthService {
           response.userExists = userExistsExplicit || (isSuccessfulLogin && hasValidUserData);
         }
         
-        console.log(`User exists determination: ${response.userExists} (explicit: ${userExistsExplicit}, data: ${hasValidUserData}, success: ${isSuccessfulLogin})`);
+        // console.log(`User exists determination: ${response.userExists} (explicit: ${userExistsExplicit}, data: ${hasValidUserData}, success: ${isSuccessfulLogin})`);
         
         if (response.userExists && response.data?.user) {
           this.setAuthData(response.data.user, response.data.token);
         } else {
-          console.log('User does not exist in the backend');
+          // console.log('User does not exist in the backend');
         }
       }),
       catchError(error => {
         // If we get a 404, it means the user doesn't exist
         if (error.status === 404) {
-          console.log('User not found (404), treating as non-existent user');
+          //console.log('User not found (404), treating as non-existent user');
           
           // Return a structured response for non-existent users
           const fakeResponse: AuthResponse = {
@@ -141,7 +141,7 @@ export class AuthService {
    * @returns Observable with AuthResponse
    */
   register(email: string, displayName?: string, photoURL?: string): Observable<AuthResponse> {
-    console.log('Attempting registration for', email);
+    //console.log('Attempting registration for', email);
     const apiUrl = `${environment.apiUrl}/auth/register`;
     
     const userData = {
@@ -150,18 +150,18 @@ export class AuthService {
       photoURL: photoURL || undefined
     };
     
-    console.log('Sending registration data:', JSON.stringify(userData));
+    //console.log('Sending registration data:', JSON.stringify(userData));
     
     return this.http.post<AuthResponse>(apiUrl, userData).pipe(
       tap(response => {
-        console.log('Registration response:', response);
+        //console.log('Registration response:', response);
         
         if (response.data?.user) {
           this.setAuthData(response.data.user, response.data.token);
         }
       }),
       catchError(error => {
-        console.error('Registration error:', error);
+        // console.error('Registration error:', error);
         return throwError(() => error);
       })
     );
@@ -172,7 +172,7 @@ export class AuthService {
    * @returns Observable with AuthResponse
    */
   loginWithGoogle(): Observable<AuthResponse> {
-    console.log('Iniciando login con Google');
+    //console.log('Iniciando login con Google');
     
     const apiUrl = `${environment.apiUrl}/auth/google`;
     
@@ -189,13 +189,13 @@ export class AuthService {
             return result.user.getIdToken();
           })
           .then(idToken => {
-            console.log('Token de Google obtenido, enviando al backend');
+            //console.log('Token de Google obtenido, enviando al backend');
             
             // Enviamos el token al backend
             this.http.post<AuthResponse>(apiUrl, { idToken })
               .subscribe({
                 next: (response) => {
-                  console.log('Respuesta del backend recibida:', response);
+                 // console.log('Respuesta del backend recibida:', response);
                   
                   if (response.data?.user && response.data?.token) {
                     // Guardamos los datos de autenticación
@@ -207,17 +207,17 @@ export class AuthService {
                   }
                 },
                 error: (error) => {
-                  console.error('Error en la autenticación con el backend:', error);
+                  //console.error('Error en la autenticación con el backend:', error);
                   observer.error(error);
                 }
               });
           })
           .catch(error => {
-            console.error('Error en el popup de Google:', error);
+            // console.error('Error en el popup de Google:', error);
             observer.error(error);
           });
       }).catch(error => {
-        console.error('Error al cargar GoogleAuthProvider:', error);
+        // console.error('Error al cargar GoogleAuthProvider:', error);
         observer.error(new Error('No se pudo cargar el módulo de autenticación'));
       });
     });
@@ -236,7 +236,7 @@ export class AuthService {
     localStorage.setItem(this.userKey, JSON.stringify(user));
     localStorage.setItem(this.tokenKey, token);
     
-    console.log('Authentication data stored for user:', user.email);
+    // console.log('Authentication data stored for user:', user.email);
   }
 
   /**
@@ -245,7 +245,7 @@ export class AuthService {
    */
   public storeAuthData(authData: {user: User, token: string}): void {
     if (!authData || !authData.user || !authData.token) {
-      console.error('Invalid auth data:', authData);
+      //console.error('Invalid auth data:', authData);
       return;
     }
     this.setAuthData(authData.user, authData.token);
@@ -264,14 +264,14 @@ export class AuthService {
    * Logout the current user
    */
   logout(): Observable<void> {
-    console.log('Logging out user');
+    // console.log('Logging out user');
     
     // Clear authentication data
     this.clearStoredAuth();
     
     // Sign out from Firebase
     auth.signOut().catch(error => {
-      console.error('Error cerrando sesión en Firebase:', error);
+      //console.error('Error cerrando sesión en Firebase:', error);
     });
     
     return of(void 0);
@@ -294,7 +294,7 @@ export class AuthService {
     const hasUser = !!this.currentUserSubject.getValue();
     const isAuth = hasToken && hasUser;
     
-    console.log('Auth check:', { hasToken, hasUser, isAuth });
+    // console.log('Auth check:', { hasToken, hasUser, isAuth });
     return isAuth;
   }
 } 

@@ -50,20 +50,20 @@ export class TaskService implements OnDestroy {
     private http: HttpClient,
     private authService: AuthService
   ) {
-    console.log('TaskService initialized with API URL:', this.apiUrl);
+    //  console.log('TaskService initialized with API URL:', this.apiUrl);
     
     // Monitor user changes and reset/reload as needed
     this.authService.currentUser$
       .pipe(takeUntil(this.destroy$))
       .subscribe(user => {
         if (!user) {
-          console.log('User logged out, resetting task state');
+          // console.log('User logged out, resetting task state');
           this.resetState();
           this.currentUserId = null;
         } else {
           const userId = user.id || null;
           if (userId !== this.currentUserId) {
-            console.log(`User changed: ${userId}. Previous: ${this.currentUserId}. Reloading tasks.`);
+            // console.log(`User changed: ${userId}. Previous: ${this.currentUserId}. Reloading tasks.`);
             this.currentUserId = userId;
             // Reset state and force reload
             this.resetState();
@@ -108,7 +108,7 @@ export class TaskService implements OnDestroy {
    * Load all tasks from the backend
    */
   loadTasks(): Observable<Task[]> {
-    console.log('Fetching tasks from server for user:', this.currentUserId);
+    // console.log('Fetching tasks from server for user:', this.currentUserId);
     
     this.setState({ isLoading: true, error: null });
     
@@ -116,9 +116,9 @@ export class TaskService implements OnDestroy {
       timeout(10000),
       map(response => this.normalizeTasksResponse(response)),
       tap(tasks => {
-        console.log(`Received ${tasks.length} tasks from API`);
+        // console.log(`Received ${tasks.length} tasks from API`);
         if (tasks.length > 0) {
-          console.log('First task sample:', JSON.stringify(tasks[0]));
+          // console.log('First task sample:', JSON.stringify(tasks[0]));
         }
         
         this.setState({ 
@@ -127,7 +127,7 @@ export class TaskService implements OnDestroy {
         });
       }),
       catchError(error => {
-        console.error('Error in loadTasks():', error);
+        // console.error('Error in loadTasks():', error);
         return this.handleError('Failed to load tasks', error);
       }),
       finalize(() => {
@@ -337,21 +337,21 @@ export class TaskService implements OnDestroy {
     
     // Handle backend API response format
     if (response.status === 'success' && response.data && response.data.task) {
-      console.log('Received standard API success response with task data');
+      // console.log('Received standard API success response with task data');
       return this.convertTaskDates(response.data.task);
     } 
     // Handle direct task response from update/create operations
     else if (response.task) {
-      console.log('Received response with task property');
+      // console.log('Received response with task property');
       return this.convertTaskDates(response.task);
     } 
     // Handle direct task object (legacy format)
     else if (response.id) {
-      console.log('Received direct task object');
+      // console.log('Received direct task object');
       return this.convertTaskDates(response);
     }
     
-    console.error('Unknown response format:', response);
+    // console.error('Unknown response format:', response);
     throw new Error('Unknown response format');
   }
   
@@ -359,37 +359,37 @@ export class TaskService implements OnDestroy {
    * Normalize tasks array response from different formats
    */
   private normalizeTasksResponse(response: any): Task[] {
-    console.log('Normalizing API response');
+    // console.log('Normalizing API response');
     
     let tasks: Task[] = [];
     
     // Standard API response format
     if (response && response.status === 'success' && response.data && Array.isArray(response.data.tasks)) {
-      console.log('Response matches standard API format with data.tasks array');
+      // console.log('Response matches standard API format with data.tasks array');
       tasks = response.data.tasks;
     }
     // Direct array response (legacy)
     else if (Array.isArray(response)) {
-      console.log('Response is a direct array of tasks');
+      // console.log('Response is a direct array of tasks');
       tasks = response;
     }
     // Other possible response formats for backward compatibility
     else if (response && response.data && Array.isArray(response.data)) {
-      console.log('Response has data array property');
+      // console.log('Response has data array property');
       tasks = response.data;
     } 
     else if (response && Array.isArray(response.tasks)) {
-      console.log('Response has tasks array property');
+      // console.log('Response has tasks array property');
       tasks = response.tasks;
     } 
     else {
-      console.warn('Unknown response format, cannot extract tasks:', response);
+      // console.warn('Unknown response format, cannot extract tasks:', response);
     }
     
     // Convert all date strings to Date objects
     tasks = tasks.map(task => this.convertTaskDates(task));
     
-    console.log(`Extracted ${tasks.length} tasks from response`);
+    // console.log(`Extracted ${tasks.length} tasks from response`);
     return tasks;
   }
 

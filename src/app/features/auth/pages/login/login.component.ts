@@ -90,24 +90,24 @@ export class LoginComponent implements OnInit, OnDestroy {
    * Check if user is already logged in and redirect if necessary
    */
   ngOnInit(): void {
-    console.log('Checking authentication status');
+    // console.log('Checking authentication status');
     this.authService.currentUser$
       .pipe(
         takeUntil(this.destroy$)
       )
       .subscribe(user => {
-        console.log('Current user from auth service:', user);
+        //console.log('Current user from auth service:', user);
         if (user) {
-          console.log('User is already authenticated:', user.email);
-          console.log('User details:', {
-            displayName: user.displayName,
-            photoURL: user.photoURL,
-            authType: user.authType
-          });
+          // console.log('User is already authenticated:', user.email);
+          // console.log('User details:', {
+           // displayName: user.displayName,
+           // photoURL: user.photoURL,
+           // authType: user.authType
+          //});
           this.currentUser = user;
           this.userAlreadyAuthenticated = true;
         } else {
-          console.log('No authenticated user found');
+          // console.log('No authenticated user found');
           this.userAlreadyAuthenticated = false;
           this.currentUser = null;
         }
@@ -130,7 +130,7 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
     
     this.isNavigating = true;
-    console.log('Navigating to tasks page');
+    // console.log('Navigating to tasks page');
     this.router.navigate(['/tasks'])
       .finally(() => {
         this.isNavigating = false;
@@ -167,24 +167,24 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   onSubmit(): void {
     if (this.loginForm.invalid || this.isLoading || this.isNavigating) {
-      console.log('Form invalid, loading, or navigation in progress - stopping submission');
+      // console.log('Form invalid, loading, or navigation in progress - stopping submission');
       return;
     }
 
     // If user is already authenticated, just navigate to tasks
     if (this.userAlreadyAuthenticated) {
-      console.log('User already authenticated, navigating to tasks');
+      // console.log('User already authenticated, navigating to tasks');
       this.continueToTasks();
       return;
     }
 
     const email = this.loginForm.get('email')?.value?.trim();
     if (!email) {
-      console.log('No email provided');
+      // console.log('No email provided');
       return;
     }
 
-    console.log('Form submitted with email:', email);
+    // console.log('Form submitted with email:', email);
     this.startAuthFlow(email);
   }
 
@@ -195,32 +195,32 @@ export class LoginComponent implements OnInit, OnDestroy {
   private startAuthFlow(email: string): void {
     // Double-check authentication status
     if (this.userAlreadyAuthenticated || this.authService.isAuthenticated()) {
-      console.log('User already authenticated, skipping login flow');
+      // console.log('User already authenticated, skipping login flow');
       this.continueToTasks();
       return;
     }
     
-    console.log('Starting auth flow for email:', email);
+    // console.log('Starting auth flow for email:', email);
     this.updateUIState(true);
     
     this.authService.login(email).pipe(
       take(1), // Ensure we only take one emission
       tap(response => {
-        console.log('Login response in component:', response);
-        console.log('User exists status:', response.userExists);
+        // console.log('Login response in component:', response);
+        // console.log('User exists status:', response.userExists);
         // Store the response for later use
         this.lastLoginResponse = response;
       }),
       catchError(error => this.handleLoginError(error, email)),
       finalize(() => {
-        console.log('Login flow completed');
+        // console.log('Login flow completed');
         this.updateUIState(false);
       }),
       takeUntil(this.destroy$)
     ).subscribe(response => {
       // Check if user became authenticated
       if (this.authService.isAuthenticated()) {
-        console.log('User authenticated during login flow');
+        // console.log('User authenticated during login flow');
         this.continueToTasks();
         return;
       }
@@ -232,15 +232,15 @@ export class LoginComponent implements OnInit, OnDestroy {
       const hasValidUserData = response.data?.user && response.data?.token;
       
       if (response.userExists || (isLoginSuccessful && hasValidUserData)) {
-        console.log('User authenticated successfully, navigating to tasks page');
+        // console.log('User authenticated successfully, navigating to tasks page');
         // If we have valid user data but aren't authenticated yet, store the data
         if (hasValidUserData && !this.authService.isAuthenticated()) {
-          console.log('Storing auth data from login response');
+          // console.log('Storing auth data from login response');
           this.authService.storeAuthData(response.data);
         }
         this.handleSuccessfulAuth('¡Inicio de sesión exitoso!');
       } else {
-        console.log('User does not exist, showing registration dialog for:', email);
+        // console.log('User does not exist, showing registration dialog for:', email);
         this.showRegistrationDialog(email);
       }
     });
@@ -253,7 +253,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    * @returns Observable with empty or error
    */
   private handleLoginError(error: HttpErrorResponse, email: string): Observable<never> {
-    console.error('Login error occurred:', error);
+    // console.error('Login error occurred:', error);
     
     try {
       // Extract useful info from the error response if available
@@ -265,14 +265,14 @@ export class LoginComponent implements OnInit, OnDestroy {
         serverMessage: serverError,
         timestamp: new Date().toISOString()
       };
-      console.error('Login error details:', errorDetails);
+      // console.error('Login error details:', errorDetails);
       
       if (error.status === 0) {
         // Network error
         this.errorMessage = 'Network error. Please check your connection.';
       } else if (error.status === 404) {
         // User not found - show registration dialog
-        console.log('User not found (404), showing registration dialog');
+        // console.log('User not found (404), showing registration dialog');
         setTimeout(() => this.showRegistrationDialog(email), 0);
         return EMPTY;
       } else if (error.status === 401) {
@@ -283,7 +283,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         if (serverError === 'Failed to create user account' || 
             errorDetails.serverMessage === 'Failed to create user account' ||
             error.error?.serverMessage === 'Failed to create user account') {
-          console.log('User does not exist (500), showing registration dialog');
+          // console.log('User does not exist (500), showing registration dialog');
           setTimeout(() => this.showRegistrationDialog(email), 0);
           return EMPTY;
         }
@@ -294,7 +294,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.errorMessage = 'Authentication error. Please try again.';
       }
     } catch (parseError) {
-      console.error('Error while parsing error:', parseError);
+      // console.error('Error while parsing error:', parseError);
       this.errorMessage = 'An unexpected error occurred. Please try again.';
     }
     
@@ -308,12 +308,12 @@ export class LoginComponent implements OnInit, OnDestroy {
   private showRegistrationDialog(email: string): void {
     // If user is somehow already authenticated, don't show dialog
     if (this.userAlreadyAuthenticated || this.authService.isAuthenticated()) {
-      console.log('User already authenticated, not showing registration dialog');
+      // console.log('User already authenticated, not showing registration dialog');
       this.continueToTasks();
       return;
     }
     
-    console.log('Showing registration dialog for email:', email);
+    // console.log('Showing registration dialog for email:', email);
     const dialogRef = this.dialog.open(RegisterConfirmDialogComponent, {
       width: '400px',
       data: { email },
@@ -327,13 +327,13 @@ export class LoginComponent implements OnInit, OnDestroy {
     ).subscribe((confirmed: boolean) => {
       // Check again if user became authenticated while dialog was open
       if (this.userAlreadyAuthenticated || this.authService.isAuthenticated()) {
-        console.log('User became authenticated, skipping registration');
+        // console.log('User became authenticated, skipping registration');
         this.continueToTasks();
         return;
       }
       
       if (confirmed) {
-        console.log('User confirmed registration, navigating directly to tasks page');
+        // console.log('User confirmed registration, navigating directly to tasks page');
         // Show success message
         this.snackBar.open('¡Bienvenido! Creando tu cuenta...', 'Cerrar', {
           duration: 3000
@@ -345,7 +345,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         // Attempt registration in the background
         this.registerInBackground(email);
       } else {
-        console.log('User canceled registration');
+        // console.log('User canceled registration');
       }
     });
   }
@@ -362,12 +362,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.authService.register(email, displayName).pipe(
       take(1),
       catchError(error => {
-        console.log('Background registration error (ignored):', error);
+        // console.log('Background registration error (ignored):', error);
         return EMPTY;
       })
     ).subscribe({
       next: (response) => {
-        console.log('Background registration completed:', response);
+        // console.log('Background registration completed:', response);
       }
     });
   }
@@ -388,18 +388,18 @@ export class LoginComponent implements OnInit, OnDestroy {
    */
   loginWithGoogle(): void {
     if (this.isGoogleLoading || this.isNavigating) {
-      console.log('Google loading or navigation in progress - stopping submission');
+      // console.log('Google loading or navigation in progress - stopping submission');
       return;
     }
     
-    console.log('Starting Google login flow');
+    // console.log('Starting Google login flow');
     this.isGoogleLoading = true;
     this.errorMessage = '';
     
     this.authService.loginWithGoogle().pipe(
       take(1),
       catchError(error => {
-        console.error('Google login error:', error);
+        // console.error('Google login error:', error);
         if (error.status === 501) {
           this.errorMessage = 'Google login no está completamente implementado en esta versión.';
         } else {
@@ -424,7 +424,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    * @param clearError Whether to clear error message
    */
   private updateUIState(isLoading: boolean, clearError: boolean = true): void {
-    console.log(`Updating UI state: isLoading=${isLoading}, clearError=${clearError}`);
+    // console.log(`Updating UI state: isLoading=${isLoading}, clearError=${clearError}`);
     this.isLoading = isLoading;
     if (clearError) {
       this.errorMessage = '';
@@ -435,7 +435,7 @@ export class LoginComponent implements OnInit, OnDestroy {
    * Clean up subscriptions when component is destroyed
    */
   ngOnDestroy(): void {
-    console.log('LoginComponent being destroyed, cleaning up subscriptions');
+    // console.log('LoginComponent being destroyed, cleaning up subscriptions');
     this.destroy$.next();
     this.destroy$.complete();
   }
