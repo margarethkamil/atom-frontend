@@ -13,7 +13,7 @@
 
   <!-- Mensaje para usuario ya autenticado -->
   <mat-card class="login-card" *ngIf="userAlreadyAuthenticated" appearance="outlined">
-    <mat-card-header>
+    <mat-card-header style="display: flex; align-items: center;">
       <div mat-card-avatar 
            class="user-avatar" 
            *ngIf="currentUser?.photoURL" 
