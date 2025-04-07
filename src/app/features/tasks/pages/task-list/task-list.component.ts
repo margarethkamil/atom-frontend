@@ -258,23 +258,19 @@ export class TaskListComponent implements OnInit, OnDestroy {
       dueDate: formValues.dueDate,
       tags
     };
-
-    // console.log('Creating new task:', newTask);
     
     this.taskService.createTask(newTask)
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (task) => {
-          // console.log('Task created successfully:', task);
           this.snackBar.open('Tarea creada con éxito', 'Cerrar', { 
             duration: 3000 
           });
-          this.taskForm.reset({
-            priority: 'medium' // Reset to default value
-          });
+          
+          // Completely recreate the form to ensure a clean state
+          this.taskForm = this.createTaskForm();
         },
         error: (error) => {
-          // console.error('Error creating task:', error);
           this.snackBar.open('Error al crear la tarea', 'Cerrar', {
             duration: 3000
           });

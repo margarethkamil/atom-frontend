@@ -29,10 +29,10 @@
           <mat-label>Título</mat-label>
           <input matInput formControlName="title" placeholder="Título de la tarea" required
                  aria-required="true" aria-describedby="title-error">
-          <mat-error id="title-error" *ngIf="taskForm.get('title')?.hasError('required')">
+          <mat-error id="title-error" *ngIf="taskForm.get('title')?.hasError('required') && taskForm.get('title')?.touched">
             El título es obligatorio
           </mat-error>
-          <mat-error id="title-error-length" *ngIf="taskForm.get('title')?.hasError('maxlength')">
+          <mat-error id="title-error-length" *ngIf="taskForm.get('title')?.hasError('maxlength') && taskForm.get('title')?.touched">
             El título no puede exceder los 100 caracteres
           </mat-error>
         </mat-form-field>
@@ -41,7 +41,7 @@
           <mat-label>Descripción</mat-label>
           <textarea matInput formControlName="description" placeholder="Descripción detallada" rows="3" 
                     required aria-required="true" aria-describedby="description-error"></textarea>
-          <mat-error id="description-error" *ngIf="taskForm.get('description')?.hasError('required')">
+          <mat-error id="description-error" *ngIf="taskForm.get('description')?.hasError('required') && taskForm.get('description')?.touched">
             La descripción es obligatoria
           </mat-error>
         </mat-form-field>
