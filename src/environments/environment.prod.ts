@@ -1,6 +1,6 @@
 export const environment = {
   production: true,
-  apiUrl: 'https://us-central1-atom-backend-396e7.cloudfunctions.net/atom',
+  apiUrl: 'https://atom-dqytahs6oq-uc.a.run.app/atom/api',
   
   // Firebase config
   firebase: {
