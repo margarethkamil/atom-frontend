@@ -22,6 +22,7 @@ import { User } from '../../../../shared/models/user.interface';
 import { CreateTaskDto, Task, TaskFilters, TaskState } from '../../../../shared/models/task.interface';
 import { TaskService } from '../../services/task.service';
 import { TaskEditDialogComponent } from '../../components/task-edit-dialog/task-edit-dialog.component';
+import { SeoService } from '../../../../core/services/seo.service';
 
 /**
  * Task List Component
@@ -79,7 +80,8 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private fb: FormBuilder,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private router: Router
+    private router: Router,
+    private seoService: SeoService
   ) {
     console.log('TaskListComponent initialized');
     
@@ -142,6 +144,13 @@ export class TaskListComponent implements OnInit, OnDestroy {
           error: state.error
         });
       });
+    
+    // Set SEO metadata
+    this.seoService.updateSeoMetadata({
+      title: 'Task Manager Dashboard',
+      description: 'Manage your tasks efficiently with ATOM Task Manager. Create, edit, and track your tasks in one place.',
+      url: window.location.href
+    });
   }
   
   /**

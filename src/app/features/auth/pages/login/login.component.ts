@@ -26,6 +26,7 @@ import {
 import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../shared/models/user.interface';
 import { RegisterConfirmDialogComponent } from '../../components/register-confirm-dialog/register-confirm-dialog.component';
+import { SeoService } from '../../../../core/services/seo.service';
 
 /**
  * Login component that handles the authentication flow:
@@ -79,7 +80,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router,
     private dialog: MatDialog,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private seoService: SeoService
   ) {
     console.log('LoginComponent initialized');
   }
@@ -110,6 +112,13 @@ export class LoginComponent implements OnInit, OnDestroy {
           this.currentUser = null;
         }
       });
+    
+    // Set SEO metadata
+    this.seoService.updateSeoMetadata({
+      title: 'Login',
+      description: 'Login to ATOM Task Manager to manage your tasks efficiently.',
+      url: window.location.href
+    });
   }
 
   /**
