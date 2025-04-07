@@ -1,3 +1,5 @@
+📄 También disponible en: [Español](README_es.md)
+
 # ATOM FE CHALLENGE - ANGULAR
 
 This project is a robust Angular-based application built with Angular 17.3.6 for the Atom technical challenge. It implements a modern, secure task management application with comprehensive user authentication and a clean, responsive UI.
