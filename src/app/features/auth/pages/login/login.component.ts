@@ -27,6 +27,7 @@ import { AuthService } from '../../../../core/services/auth.service';
 import { User } from '../../../../shared/models/user.interface';
 import { RegisterConfirmDialogComponent } from '../../components/register-confirm-dialog/register-confirm-dialog.component';
 import { SeoService } from '../../../../core/services/seo.service';
+import { GAnalyticsService } from '../../../../core/services/ganalytics.service';
 
 /**
  * Login component that handles the authentication flow:
@@ -81,7 +82,8 @@ export class LoginComponent implements OnInit, OnDestroy {
     private router: Router,
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private analyticsService: GAnalyticsService
   ) {
     console.log('LoginComponent initialized');
   }
@@ -119,6 +121,9 @@ export class LoginComponent implements OnInit, OnDestroy {
       description: 'Login to ATOM Task Manager to manage your tasks efficiently.',
       url: window.location.href
     });
+    
+    // Track page view for login page
+    this.analyticsService.sendPageView('/login', 'Login Page');
   }
 
   /**

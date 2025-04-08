@@ -23,6 +23,7 @@ import { CreateTaskDto, Task, TaskFilters, TaskState } from '../../../../shared/
 import { TaskService } from '../../services/task.service';
 import { TaskEditDialogComponent } from '../../components/task-edit-dialog/task-edit-dialog.component';
 import { SeoService } from '../../../../core/services/seo.service';
+import { GAnalyticsService } from '../../../../core/services/ganalytics.service';
 
 /**
  * Task List Component
@@ -81,7 +82,8 @@ export class TaskListComponent implements OnInit, OnDestroy {
     private dialog: MatDialog,
     private snackBar: MatSnackBar,
     private router: Router,
-    private seoService: SeoService
+    private seoService: SeoService,
+    private analyticsService: GAnalyticsService
   ) {
     // console.log('TaskListComponent initialized');
     
@@ -151,6 +153,9 @@ export class TaskListComponent implements OnInit, OnDestroy {
       description: 'Manage your tasks efficiently with ATOM Task Manager. Create, edit, and track your tasks in one place.',
       url: window.location.href
     });
+    
+    // Track page view for tasks page
+    this.analyticsService.sendPageView('/tasks', 'Tasks Page');
   }
   
   /**
