@@ -1,0 +1,24 @@
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.mat-dialog-content {
+  padding-top: 12px;
+  min-width: 400px;
+}
+
+.completed-checkbox {
+  display: block;
+  margin: 12px 0 16px;
+}
+
+@media (max-width: 600px) {
+  .mat-dialog-content {
+    min-width: auto;
+  }
+}
+
+button {
+  margin-left: 8px;
+} 

@@ -1,0 +1,110 @@
+<div class="login-container">
+  <!-- Depuración - Solo visible durante desarrollo -->
+  <div class="debug-info" *ngIf="false">
+    <p>Estado de autenticación: {{userAlreadyAuthenticated ? 'Autenticado' : 'No autenticado'}}</p>
+    <p *ngIf="currentUser">Información de usuario:</p>
+    <ul *ngIf="currentUser">
+      <li>Email: {{currentUser?.email}}</li>
+      <li>Nombre: {{currentUser?.displayName}}</li>
+      <li>Foto URL: {{currentUser?.photoURL}}</li>
+      <li>Auth Type: {{currentUser?.authType}}</li>
+    </ul>
+  </div>
+
+  <!-- Mensaje para usuario ya autenticado -->
+  <mat-card class="login-card" *ngIf="userAlreadyAuthenticated" appearance="outlined">
+    <mat-card-header style="display: flex; align-items: center;">
+      <div mat-card-avatar 
+           class="user-avatar" 
+           *ngIf="currentUser?.photoURL" 
+           [ngStyle]="{'background-image': 'url(' + currentUser?.photoURL + ')'}"></div>
+      <mat-card-title>¡Hola, {{currentUser?.displayName || currentUser?.email}}!</mat-card-title>
+      <mat-card-subtitle *ngIf="currentUser">{{currentUser.email}}</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+      <div class="authenticated-message">
+        <p>Ya has iniciado sesión. ¿Qué deseas hacer?</p>
+        
+        <div class="auth-actions">
+          <button 
+            mat-raised-button 
+            color="primary" 
+            (click)="continueToTasks()"
+            class="login-button">
+            <mat-icon>list</mat-icon>
+            Ver mis tareas
+          </button>
+          
+          <button 
+            mat-stroked-button
+            color="warn"
+            (click)="logout()"
+            [disabled]="isLoading"
+            class="logout-button">
+            <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+            <span *ngIf="!isLoading">
+              <mat-icon>logout</mat-icon>
+              Cerrar sesión
+            </span>
+          </button>
+        </div>
+      </div>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Formulario de login normal -->
+  <mat-card class="login-card" *ngIf="!userAlreadyAuthenticated" appearance="outlined">
+    <div class="orange-top-border"></div>
+    <mat-card-content>
+      <div class="login-header">
+        <h1 class="login-title">Inicia sesión</h1>
+        <p class="login-subtitle">Gestiona tus tareas diarias de forma simple y eficiente</p>
+      </div>
+      
+
+      
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Correo Electrónico</mat-label>
+          <input matInput formControlName="email" type="email" required>
+          <mat-icon matSuffix>email</mat-icon>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('required')">
+            El correo electrónico es requerido
+          </mat-error>
+          <mat-error *ngIf="loginForm.get('email')?.hasError('email')">
+            Ingresa un correo electrónico válido
+          </mat-error>
+        </mat-form-field>
+        
+        <div class="error-message" *ngIf="errorMessage">
+          {{ errorMessage }}
+        </div>
+        
+        <button 
+          mat-raised-button 
+          color="primary" 
+          type="submit" 
+          class="login-button"
+          [disabled]="loginForm.invalid || isLoading">
+          <mat-spinner *ngIf="isLoading" diameter="20" class="button-spinner"></mat-spinner>
+          <span *ngIf="!isLoading">Continuar con email</span>
+        </button>
+      </form>
+      
+      <div class="divider">o</div>
+      
+      <button 
+        mat-stroked-button 
+        class="google-button" 
+        (click)="loginWithGoogle()"
+        [disabled]="isGoogleLoading">
+        <mat-spinner *ngIf="isGoogleLoading" diameter="20" class="button-spinner"></mat-spinner>
+        <div *ngIf="!isGoogleLoading" class="google-button-content">
+          <img src="assets/images/icons8-google.svg" alt="Google" class="google-logo">
+          <span>Continuar con Google</span>
+        </div>
+      </button>
+    </mat-card-content>
+  </mat-card>
+
+</div> 

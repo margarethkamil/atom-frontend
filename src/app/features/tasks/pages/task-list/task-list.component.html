@@ -1,0 +1,216 @@
+<!-- Task Management View -->
+<div class="task-container" role="main">
+  <!-- Header with user info -->
+  <header class="task-header" role="banner">
+    <div class="user-info" *ngIf="currentUser">
+      <div class="user-avatar" *ngIf="currentUser.photoURL" aria-hidden="true">
+        <img [src]="currentUser.photoURL" [attr.alt]="'Foto de perfil de ' + (currentUser.displayName || currentUser.email)" (error)="handleImageError($event)">
+      </div>
+      <div class="user-details">
+        <h3>Bienvenido, {{ currentUser.displayName || currentUser.email }}</h3>
+      </div>
+      <button mat-icon-button color="warn" (click)="logout()" aria-label="Cerrar sesión" class="logout-button" 
+        tabindex="0">
+        <mat-icon>logout</mat-icon>
+      </button>
+    </div>
+  </header>
+
+  <!-- Add Task Form -->
+  <mat-card class="new-task-card" appearance="outlined">
+    <!-- Tape image -->
+    <img src="assets/images/duct-tape.png" class="tape-image form-tape" alt="tape">
+    
+    <mat-card-content>
+      <form [formGroup]="taskForm" (ngSubmit)="onSubmit()" role="form" aria-labelledby="newTaskFormTitle">
+        <h2 id="newTaskFormTitle">Nueva Tarea</h2>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Título</mat-label>
+          <input matInput formControlName="title" placeholder="Título de la tarea" required
+                 aria-required="true" aria-describedby="title-error">
+          <mat-error id="title-error" *ngIf="taskForm.get('title')?.hasError('required') && taskForm.get('title')?.touched">
+            El título es obligatorio
+          </mat-error>
+          <mat-error id="title-error-length" *ngIf="taskForm.get('title')?.hasError('maxlength') && taskForm.get('title')?.touched">
+            El título no puede exceder los 100 caracteres
+          </mat-error>
+        </mat-form-field>
+        
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descripción</mat-label>
+          <textarea matInput formControlName="description" placeholder="Descripción detallada" rows="3" 
+                    required aria-required="true" aria-describedby="description-error"></textarea>
+          <mat-error id="description-error" *ngIf="taskForm.get('description')?.hasError('required') && taskForm.get('description')?.touched">
+            La descripción es obligatoria
+          </mat-error>
+        </mat-form-field>
+        
+        <!-- Priority Field -->
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Prioridad</mat-label>
+            <mat-select formControlName="priority" aria-label="Seleccionar prioridad de la tarea">
+              <mat-option value="low">
+                <span class="priority-option"><span class="priority-dot low"></span>Baja</span>
+              </mat-option>
+              <mat-option value="medium">
+                <span class="priority-option"><span class="priority-dot medium"></span>Media</span>
+              </mat-option>
+              <mat-option value="high">
+                <span class="priority-option"><span class="priority-dot high"></span>Alta</span>
+              </mat-option>
+            </mat-select>
+          </mat-form-field>
+        
+          <!-- Due Date Field -->
+          <mat-form-field appearance="outline" class="half-width">
+            <mat-label>Fecha límite</mat-label>
+            <input matInput [matDatepicker]="picker" formControlName="dueDate" aria-label="Seleccionar fecha límite">
+            <mat-datepicker-toggle matSuffix [for]="picker" aria-label="Abrir selector de fecha"></mat-datepicker-toggle>
+            <mat-datepicker #picker></mat-datepicker>
+          </mat-form-field>
+        </div>
+        
+        <!-- Tags Field -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Etiquetas (separadas por comas)</mat-label>
+          <input matInput formControlName="tags" placeholder="trabajo, informe, proyecto"
+                 aria-label="Etiquetas separadas por comas">
+          <mat-hint id="tags-hint">Escribe las etiquetas separadas por comas</mat-hint>
+        </mat-form-field>
+        
+        <div class="button-container">
+          <button
+            mat-raised-button
+            color="primary"
+            type="submit"
+            [disabled]="taskForm.invalid || (taskState$ | async)?.isLoading"
+            aria-label="Guardar nueva tarea">
+            <mat-spinner *ngIf="(taskState$ | async)?.isLoading" diameter="20" class="button-spinner" aria-label="Guardando..."></mat-spinner>
+            <span *ngIf="!(taskState$ | async)?.isLoading">Guardar</span>
+          </button>
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+
+  <!-- Error message display -->
+  <div *ngIf="(taskState$ | async)?.error" class="error-message" role="alert" aria-live="assertive">
+    {{ (taskState$ | async)?.error }}
+    <button mat-button color="primary" (click)="loadTasks()" aria-label="Reintentar cargar tareas">Reintentar</button>
+  </div>
+
+  <!-- Tasks Filter Section -->
+  <div class="task-filters" role="search" aria-label="Filtrar tareas">
+    <mat-form-field appearance="outline" class="search-filter">
+      <mat-label>Buscar tareas</mat-label>
+      <input matInput #searchInput (keyup)="updateSearchTerm(searchInput.value)" 
+             placeholder="Buscar por título o descripción" aria-label="Buscar tareas por título o descripción">
+      <mat-icon matSuffix aria-hidden="true">search</mat-icon>
+    </mat-form-field>
+    
+    <div class="filter-actions" role="radiogroup" aria-label="Filtrar por estado">
+      <button mat-button color="primary" [class.active-filter]="isShowingAllTasks()" 
+        (click)="showAllTasks()" [attr.aria-pressed]="isShowingAllTasks()" tabindex="0">
+        Todas
+      </button>
+      <button mat-button color="primary" [class.active-filter]="isShowingPendingTasks()"
+        (click)="showPendingTasks()" [attr.aria-pressed]="isShowingPendingTasks()" tabindex="0">
+        Pendientes
+      </button>
+      <button mat-button color="primary" [class.active-filter]="isShowingCompletedTasks()"
+        (click)="showCompletedTasks()" [attr.aria-pressed]="isShowingCompletedTasks()" tabindex="0">
+        Completadas
+      </button>
+      
+      <button mat-icon-button class="refresh-button" aria-label="Actualizar lista de tareas" 
+        (click)="refreshTasks()" [disabled]="(taskState$ | async)?.isLoading" tabindex="0">
+        <mat-icon>refresh</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <!-- Task list -->
+  <section class="task-list-container" role="region" aria-label="Lista de tareas">
+    <div *ngIf="(taskState$ | async)?.isLoading && (filteredTasks$ | async)?.length === 0" class="loading-container" aria-live="polite">
+      <mat-spinner diameter="48" aria-label="Cargando tareas"></mat-spinner>
+      <p>Cargando tareas...</p>
+    </div>
+
+    <div *ngIf="!(taskState$ | async)?.isLoading && (filteredTasks$ | async)?.length === 0" class="empty-container" aria-live="polite">
+      <mat-icon aria-hidden="true">assignment</mat-icon>
+      <p>No hay tareas para mostrar</p>
+      <p *ngIf="hasFiltersApplied()" class="hint-text">
+        Intenta cambiar los filtros aplicados
+      </p>
+    </div>
+
+    <div class="task-list" role="list">
+      <mat-card *ngFor="let task of filteredTasks$ | async; let i = index" class="task-card" 
+                [ngClass]="{'completed': task.completed}" role="listitem" tabindex="0"
+                [attr.aria-label]="'Tarea: ' + task.title + (task.completed ? ', completada' : ', pendiente')">
+        <!-- Tape image -->
+        <img src="assets/images/duct-tape.png" class="tape-image" [class.completed-tape]="task.completed" alt="tape">
+                
+        <mat-card-header>
+          <mat-card-title class="task-title">
+            <mat-checkbox
+              [checked]="task.completed"
+              (change)="toggleComplete(task)"
+              color="primary"
+              [attr.aria-label]="'Marcar como ' + (task.completed ? 'pendiente' : 'completada') + ': ' + task.title">
+              {{ task.title }}
+            </mat-checkbox>
+            <span *ngIf="task.completed" class="completed-badge" aria-label="Tarea completada">
+              <mat-icon>check_circle</mat-icon>Completada
+            </span>
+          </mat-card-title>
+          <mat-card-subtitle class="task-dates">
+            <div aria-label="Fecha de creación">Creada el {{ formatDate(task.createdAt) }}</div>
+            <div *ngIf="task.updatedAt" aria-label="Fecha de actualización">Actualizada el {{ formatDate(task.updatedAt) }}</div>
+          </mat-card-subtitle>
+        </mat-card-header>
+        <mat-card-content>
+          <p class="task-description">{{ task.description }}</p>
+          
+          <!-- Task metadata -->
+          <div class="task-metadata">
+            <!-- Priority badge if available -->
+            <div *ngIf="task.priority" class="priority-badge" [ngClass]="'priority-' + task.priority.toLowerCase()"
+                 [attr.aria-label]="'Prioridad: ' + (task.priority === 'low' ? 'Baja' : (task.priority === 'medium' ? 'Media' : 'Alta'))">
+              <mat-icon *ngIf="task.priority === 'high'" aria-hidden="true">priority_high</mat-icon>
+              <mat-icon *ngIf="task.priority === 'medium'" aria-hidden="true">fiber_manual_record</mat-icon>
+              <mat-icon *ngIf="task.priority === 'low'" aria-hidden="true">arrow_downward</mat-icon>
+              {{ task.priority === 'low' ? 'Baja' : (task.priority === 'medium' ? 'Media' : 'Alta') }}
+            </div>
+            
+            <!-- Due date if available -->
+            <div *ngIf="task.dueDate" class="due-date" [ngClass]="{'due-soon': isDateSoon(task.dueDate)}" [attr.aria-label]="'Fecha límite: ' + formatDate(task.dueDate)">
+              <mat-icon aria-hidden="true">event</mat-icon>
+              <span>{{ formatDate(task.dueDate) }}</span>
+            </div>
+          </div>
+          
+          <!-- Tags if available -->
+          <div *ngIf="task.tags && task.tags.length > 0" class="task-tags" aria-label="Etiquetas">
+            <mat-chip-set aria-label="Lista de etiquetas">
+              <mat-chip *ngFor="let tag of task.tags">{{ tag }}</mat-chip>
+            </mat-chip-set>
+          </div>
+        </mat-card-content>
+        <mat-card-actions align="end">
+          <button mat-icon-button color="primary" (click)="editTask(task)" 
+                  [attr.aria-label]="'Editar tarea ' + task.title" tabindex="0">
+            <mat-icon>edit</mat-icon>
+          </button>
+          <button mat-icon-button color="warn" (click)="deleteTask(task)" 
+                  [attr.aria-label]="'Eliminar tarea ' + task.title" tabindex="0">
+            <mat-icon>delete</mat-icon>
+          </button>
+        </mat-card-actions>
+      </mat-card>
+    </div>
+  </section>
+
+</div> 

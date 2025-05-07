@@ -1,0 +1,846 @@
+// Variables globales
+$primary-color: #e85d04; // Orange
+$primary-light: rgba(232, 93, 4, 0.08);
+$text-primary: #1f2937;
+$text-secondary: #6b7280; 
+$background-light: #fff8f3;
+$background-card: #ffffff;
+$error-color: #ef4444;
+$success-color: #10b981;
+$warning-color: #f59e0b;
+$border-radius: 12px;
+$box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+$transition-default: all 0.2s ease;
+
+// Mixins
+@mixin focus-visible {
+  &:focus-visible {
+    outline: 2px solid $primary-color;
+    outline-offset: 2px;
+  }
+}
+
+@mixin hover-elevation {
+  transition: $transition-default;
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+  }
+}
+
+// Sticky tape mixin for reuse
+@mixin sticky-tape($width, $height, $rotate, $top, $right) {
+  content: '';
+  position: absolute;
+  width: $width;
+  height: $height;
+  top: $top;
+  right: $right;
+  background-image: url('../../../../../assets/images/duct-tape.png');
+  background-size: contain;
+  background-repeat: no-repeat;
+  transform: rotate($rotate);
+  z-index: 3;
+}
+
+@keyframes subtle-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.task-container {
+  max-width: 1140px;
+  margin: 0 auto;
+  padding: 30px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  color: $text-primary;
+  position: relative;
+  min-height: 100vh;
+  
+  // Light orange background
+  background: linear-gradient(130deg, #fff1e6, #ffedd8, #ffe8d6);
+  background-size: 400% 400%;
+  animation: subtle-shift 15s ease infinite;
+  
+  @media (min-width: 1200px) {
+    padding: 30px 40px;
+  }
+}
+
+.task-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 16px;
+  
+  h1 {
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  .user-info {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-size: 14px;
+    color: $text-secondary;
+    width: 100%;
+    justify-content: flex-start;
+    background-color: $background-card;
+    padding: 12px 16px;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    position: relative;
+    
+    .user-avatar {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      overflow: hidden;
+      border: 1px solid rgba(0, 0, 0, 0.1);
+      background-color: $background-light;
+      flex-shrink: 0;
+      display: block;
+      
+      img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+      }
+    }
+    
+    .user-details {
+      flex: 1;
+      
+      h3 {
+        margin: 0;
+        font-size: 15px;
+        font-weight: 600;
+        color: $text-primary;
+      }
+    }
+    
+    .logout-button {
+      margin-left: auto;
+      transition: all 0.2s ease;
+      @include focus-visible;
+      
+      &:hover {
+        background-color: rgba($error-color, 0.1);
+        color: $error-color;
+      }
+    }
+  }
+}
+
+.new-task-card {
+  margin-bottom: 24px;
+  border-radius: $border-radius;
+  border: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  overflow: visible;
+  transition: $transition-default;
+  background-color: white;
+  position: relative;
+  z-index: 1;
+  transform: rotate(0deg);
+  
+  // Remove horizontal ruled lines
+  // background-image: 
+  //   linear-gradient(rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  // background-size: 100% 24px;
+  // background-position: 0 52px; // Start lines below the header
+  
+  // Remove previous tape styles
+  &::before, &::after {
+    display: none;
+  }
+  
+  // Removed duct tape in the right corner
+  // &:before {
+  //   @include sticky-tape(100px, 40px, -45deg, -20px, -25px);
+  //   opacity: 0.9;
+  // }
+  
+  // Remove second tape piece
+  &:after {
+    display: none;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.12);
+  }
+  
+  mat-card-content {
+    padding: 20px;
+    position: relative;
+  }
+  
+  h2 {
+    font-size: 20px;
+    font-weight: 600;
+    margin-bottom: 24px;
+    color: $text-primary;
+    position: relative;
+    display: inline-block;
+    margin-top: 0;
+    z-index: 2;
+
+    &:after {
+      display: none;
+    }
+    
+    // Add a highlight effect behind the title
+    &:before {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: -5px;
+      width: calc(100% + 10px);
+      height: 8px;
+      background-color: rgba($primary-color, 0.2);
+      z-index: -1;
+      border-radius: 4px;
+    }
+  }
+  
+  // Style form elements to fit sticky note theme
+  ::ng-deep {
+    .mat-mdc-form-field-focus-overlay {
+      background-color: rgba(255, 255, 255, 0.2);
+    }
+    
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__leading,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__notch,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled) .mdc-notched-outline__trailing {
+      border-color: rgba(0, 0, 0, 0.15);
+    }
+    
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__leading,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__notch,
+    .mdc-text-field--outlined:not(.mdc-text-field--disabled).mdc-text-field--focused .mdc-notched-outline__trailing {
+      border-color: $primary-color;
+    }
+    
+    // Make input backgrounds slightly translucent
+    .mat-mdc-form-field-flex {
+      background-color: rgba(255, 255, 255, 0.5);
+    }
+  }
+}
+
+.full-width {
+  width: 100%;
+  margin-bottom: 16px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 12px;
+  
+  button {
+    min-width: 100px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 20px;
+    font-weight: 500;
+    font-size: 14px;
+    text-transform: none;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    
+    &:not([disabled]) {
+      transition: $transition-default;
+      background-color: $primary-color;
+      
+      &:hover {
+        transform: translateY(-2px) scale(1.05);
+        box-shadow: 0 4px 12px rgba($primary-color, 0.4);
+      }
+    }
+  }
+}
+
+.button-spinner {
+  margin: 0 auto;
+}
+
+.error-message {
+  background-color: rgba($error-color, 0.08);
+  color: $error-color;
+  padding: 12px 16px;
+  border-radius: $border-radius;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 14px;
+  border-left: 2px solid $error-color;
+  
+  button {
+    font-weight: 500;
+    @include focus-visible;
+  }
+}
+
+.task-filters {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 12px;
+  margin-bottom: 20px;
+  padding: 16px;
+  background-color: $background-card;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  transition: $transition-default;
+  
+  .search-filter {
+    width: 100%;
+    margin-bottom: 0;
+  }
+  
+  .filter-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+    justify-content: flex-start;
+    
+    button {
+      @include focus-visible;
+      border-radius: 16px;
+      font-weight: 500;
+      font-size: 13px;
+      padding: 0 16px;
+      height: 32px;
+      transition: all 0.2s ease;
+      
+      &.active-filter {
+        background-color: $primary-color;
+        color: white;
+      }
+      
+      &:hover:not(.active-filter) {
+        background-color: $primary-light;
+        color: $primary-color;
+      }
+    }
+  }
+  
+  @media (min-width: 768px) {
+    flex-direction: row;
+    align-items: center;
+    
+    .search-filter {
+      flex: 1;
+      margin-right: 16px;
+      max-width: 350px;
+    }
+    
+    .filter-actions {
+      justify-content: flex-end;
+      flex-wrap: nowrap;
+    }
+  }
+}
+
+.task-list-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.loading-container, .empty-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: $text-secondary;
+  background-color: $background-card;
+  border-radius: $border-radius;
+  margin: 12px 0 20px;
+  box-shadow: $box-shadow;
+  
+  mat-icon {
+    font-size: 40px;
+    height: 40px;
+    width: 40px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+    color: $primary-color;
+  }
+  
+  p {
+    margin: 5px 0;
+    font-size: 15px;
+    &:first-of-type {
+      font-weight: 600;
+      font-size: 16px;
+      color: $text-primary;
+    }
+  }
+  
+  .hint-text {
+    font-size: 13px;
+    opacity: 0.8;
+    margin-top: 6px;
+  }
+}
+
+.task-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  
+  @media (min-width: 992px) {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+  
+  @media (min-width: 1200px) {
+    grid-template-columns: repeat(2, 1fr); // 2 columns on large screens
+  }
+}
+
+.task-card {
+  border-radius: $border-radius;
+  border: 0;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.08);
+  overflow: visible; // Changed to visible to allow the tape to extend outside
+  transition: $transition-default;
+  background-color: #FFF9C4; // Soft yellow color like the Windows 11 sticky note
+  position: relative;
+  z-index: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  padding: 0;
+  transform: rotate(0deg);
+  
+  // Horizontal ruled lines like a real sticky note
+  background-image: 
+    linear-gradient(rgba(0, 0, 0, 0.05) 1px, transparent 1px);
+  background-size: 100% 24px;
+  background-position: 0 30px; // Start lines below the header
+  
+  // Remove previous tape styles
+  &::before, &::after {
+    display: none;
+  }
+  
+  // Add duct tape image in the right corner
+  &:before {
+    @include sticky-tape(100px, 40px, -45deg, -20px, -25px);
+    opacity: 0.9;
+  }
+  
+  // Random subtle rotation for each card
+  &:nth-child(odd) {
+    transform: rotate(-0.3deg);
+  }
+  
+  &:nth-child(even) {
+    transform: rotate(0.3deg);
+  }
+  
+  &:nth-child(3n) {
+    transform: rotate(0.2deg);
+  }
+  
+  &:nth-child(5n) {
+    transform: rotate(-0.2deg);
+  }
+  
+  &:hover {
+    transform: translateY(-5px) rotate(0deg);
+    box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  &.completed {
+    background-color: #E0E0E0; // Gray background for completed tasks
+    opacity: 0.9;
+    
+    // Change ruled lines for completed tasks
+    background-image: 
+      linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+    
+    // Greyscale effect for the tape on completed tasks
+    &:before {
+      filter: grayscale(1);
+      opacity: 0.7;
+    }
+    
+    .task-title {
+      color: $text-secondary;
+      text-decoration: line-through;
+    }
+    
+    .task-description {
+      color: $text-secondary;
+      opacity: 0.8;
+    }
+    
+    .completed-badge {
+      display: inline-flex;
+      align-items: center;
+      background-color: rgba($success-color, 0.1);
+      color: $success-color;
+      font-size: 12px;
+      font-weight: 500;
+      padding: 3px 8px;
+      border-radius: 10px;
+      
+      mat-icon {
+        font-size: 12px;
+        height: 12px;
+        width: 12px;
+        margin-right: 3px;
+      }
+      
+      @media (max-width: 768px) {
+        margin-left: 28px; // Indent to align with text on mobile
+      }
+    }
+  }
+  
+  mat-card-header {
+    padding: 16px 16px 8px;
+    margin-bottom: 0;
+    border-bottom: 0;
+  }
+  
+  mat-card-title {
+    font-size: 15px;
+    margin-bottom: 6px;
+    font-weight: 500;
+    line-height: 1.4;
+    
+    ::ng-deep .mat-mdc-checkbox {
+      margin-right: 6px;
+    }
+  }
+  
+  mat-card-subtitle {
+    font-size: 12px;
+    color: $text-secondary;
+    margin-bottom: 10px;
+    
+    &.task-dates {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+      
+      div {
+        display: block;
+        line-height: 1.4;
+      }
+    }
+  }
+  
+  mat-card-content {
+    padding: 0 16px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .task-description {
+    white-space: pre-line;
+    margin: 4px 0 12px;
+    color: $text-primary;
+    line-height: 1.5;
+    font-size: 14px;
+    flex: 1;
+  }
+  
+  mat-card-actions {
+    padding: 10px 12px;
+    display: flex;
+    justify-content: flex-end;
+    gap: 6px;
+    margin-top: auto;
+    background-color: rgba(255, 255, 255, 0.3); // Slightly transparent footer
+    
+    button {
+      @include focus-visible;
+      transition: all 0.2s ease;
+      
+      &:hover {
+        background-color: rgba(0, 0, 0, 0.05);
+      }
+    }
+  }
+  
+  .task-title {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+}
+
+// Generate different color sticky notes
+.task-card:nth-child(4n+1) {
+  background-color: #FFF9C4; // Yellow
+}
+
+.task-card:nth-child(4n+2) {
+  background-color: #DCEDC8; // Light green
+}
+
+.task-card:nth-child(4n+3) {
+  background-color: #B3E5FC; // Light blue
+}
+
+.task-card:nth-child(4n+4) {
+  background-color: #F8BBD0; // Light pink
+}
+
+
+
+.task-metadata {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 12px;
+  margin-bottom: 12px;
+  
+  .priority-badge {
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 12px;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    
+    &.priority-high {
+      background-color: rgba($error-color, 0.08);
+      color: $error-color;
+    }
+    
+    &.priority-medium {
+      background-color: rgba($warning-color, 0.08);
+      color: $warning-color;
+    }
+    
+    &.priority-low {
+      background-color: rgba($success-color, 0.08);
+      color: $success-color;
+    }
+    
+    mat-icon {
+      font-size: 14px;
+      width: 14px;
+      height: 14px;
+      margin-right: 4px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+    }
+  }
+  
+  .due-date {
+    display: flex;
+    align-items: center;
+    font-size: 12px;
+    color: $text-secondary;
+    padding: 4px 8px;
+    background-color: rgba(0, 0, 0, 0.04);
+    border-radius: 8px;
+    
+    &.due-soon {
+      background-color: rgba($error-color, 0.08);
+      color: $error-color;
+      
+      mat-icon {
+        color: $error-color;
+      }
+    }
+    
+    mat-icon {
+      font-size: 14px;
+      height: 14px;
+      width: 14px;
+      margin-right: 4px;
+    }
+  }
+}
+
+.task-tags {
+  margin-top: 12px;
+  
+  mat-chip-set {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  
+  ::ng-deep .mdc-evolution-chip {
+    background-color: rgba(0, 0, 0, 0.04) !important;
+    border-radius: 8px !important;
+    height: 24px !important;
+    transition: all 0.2s ease;
+    
+    &:hover {
+      background-color: $primary-light !important;
+    }
+    
+    .mat-mdc-chip-action-label {
+      font-size: 12px;
+      color: $text-primary;
+      font-weight: 400;
+      padding: 0px 4px;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .task-container {
+    padding: 20px 16px;
+  }
+  
+  .task-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 16px;
+    
+    .user-info {
+      width: 100%;
+      flex-direction: row;
+      align-items: center;
+      
+      .user-details {
+        flex: 1;
+      }
+    }
+  }
+  
+  .task-filters {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .search-filter {
+      margin-right: 0;
+      margin-bottom: 12px;
+    }
+    
+    .filter-actions {
+      justify-content: space-between;
+    }
+  }
+  
+  .button-container button {
+    width: 100%;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 16px;
+  width: 100%;
+  margin-bottom: 16px;
+  
+  @media (max-width: 600px) {
+    flex-direction: column;
+    gap: 12px;
+  }
+}
+
+.half-width {
+  flex: 1;
+  width: 100%;
+  
+  @media (max-width: 600px) {
+    margin-bottom: 0;
+  }
+}
+
+.priority-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.priority-dot {
+  display: inline-block;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  
+  &.high {
+    background-color: $error-color;
+  }
+  
+  &.medium {
+    background-color: $warning-color;
+  }
+  
+  &.low {
+    background-color: $success-color;
+  }
+}
+
+.refresh-button {
+  background-color: $primary-light;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    transform: rotate(180deg);
+    background-color: $primary-light;
+  }
+  
+  &:not([disabled]):active {
+    transform: rotate(180deg) scale(0.9);
+  }
+  
+  mat-icon {
+    color: $primary-color;
+  }
+}
+
+// Add this style for the tape images
+.tape-image {
+  position: absolute;
+  width: 100px;
+  top: -20px;
+  right: -15px;
+  z-index: 3;
+  opacity: 0.9;
+  
+  &.form-tape {
+    width: 100px;
+  }
+  
+  &.completed-tape {
+    filter: grayscale(1);
+    opacity: 0.7;
+  }
+}
+
+
+// Remove the pseudo-element tape styles since we're using actual images now
+.task-card:before,
+.new-task-card:before {
+  display: none;
+} 
